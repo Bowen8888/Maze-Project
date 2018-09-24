@@ -8,6 +8,7 @@ public class TileWallsController : MonoBehaviour
 	private GameObject _westWall;
 	private GameObject _eastWall;
 	private GameObject _southWall;
+	private int _row;
 	
 	// Use this for initialization
 	void Awake ()
@@ -45,5 +46,15 @@ public class TileWallsController : MonoBehaviour
 			default:
 				throw new ArgumentOutOfRangeException("tileWallName", tileWallName, null);
 		}
+	}
+
+	public void SetRow(int row)
+	{
+		_row = row;
+	}
+
+	public int GetRow()
+	{
+		return _row;
 	}
 }

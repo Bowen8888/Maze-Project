@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,12 +11,18 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayers;
     public GameObject projectilePrefab;
     public Transform projectileSpawn;
-
+    private int projectileCount;
+    public Text projectileCountText;
+    public Text winText;
+    
+    
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         rb = GetComponent<Rigidbody>();
         col = GetComponent<CapsuleCollider>();
+        projectileCount = 0;
+        SetProjectileCount();
     }
     
     void Update()
@@ -27,7 +34,7 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                rb.AddForce(Vector3.up * 20, ForceMode.Impulse);
+                rb.AddForce(Vector3.up * 15    , ForceMode.Impulse);
             }
             
             float moveHorizontal = Input.GetAxis("Horizontal") * speed;
@@ -39,7 +46,7 @@ public class PlayerController : MonoBehaviour
             transform.Translate(moveHorizontal,0,moveVertical);
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (projectileCount > 0 && Input.GetKeyDown(KeyCode.F))
         {
             Fire();
         }
@@ -47,18 +54,25 @@ public class PlayerController : MonoBehaviour
 
     private void Fire()
     {
+        projectileCount--;
+        SetProjectileCount();
         GameObject projectile = Instantiate(projectilePrefab, projectileSpawn.position, projectileSpawn.rotation);
-
         projectile.GetComponent<Rigidbody>().velocity = projectile.transform.forward * speed*2.5f;
-        
-        Destroy(projectile, 2);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Pick Up"))
         {
+            projectileCount++;
+            SetProjectileCount();
             other.gameObject.SetActive(false);
+        }
+        
+        if (other.gameObject.CompareTag("Goal"))
+        {
+            other.gameObject.SetActive(false);
+            winText.gameObject.SetActive(true);
         }
     }
 
@@ -66,5 +80,10 @@ public class PlayerController : MonoBehaviour
     {
         return Physics.CheckCapsule(col.bounds.center, new Vector3(col.bounds.center.x,
                 col.bounds.min.y, col.bounds.center.z), col.radius, groundLayers);
+    }
+
+    private void SetProjectileCount()
+    {
+        projectileCountText.text = "Projectile count: " + projectileCount;
     }
 }

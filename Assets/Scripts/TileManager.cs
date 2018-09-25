@@ -11,6 +11,7 @@ public class TileManager : MonoBehaviour
 	private Transform _playerTransform;
 	private int _spawnZ = 0;
 	private readonly int[] _previousRow = new int[8];
+	private GameObject[] _lastRow = new GameObject[8];
 	
 	// Use this for initialization
 	void Start ()
@@ -100,6 +101,8 @@ public class TileManager : MonoBehaviour
 				tileCopy.GetComponent<TileWallsController>()
 					.SetWallActivate(TileWallsController.TileWallName.WestWall,true);
 			}
+
+			_lastRow[i] = tileCopy;
 		}
 		_spawnZ += 5;
 	}
@@ -123,5 +126,18 @@ public class TileManager : MonoBehaviour
 		}
 		
 		return result;
-	} 
+	}
+
+	public int GetScreenLimit()
+	{
+		return _spawnZ + 10;
+	}
+
+	public void ConstructNorthWalls()
+	{
+		foreach (var tile in _lastRow)
+		{
+			tile.GetComponent<TileWallsController>().SetWallActivate(TileWallsController.TileWallName.NorthWall, true);
+		}
+	}
 }

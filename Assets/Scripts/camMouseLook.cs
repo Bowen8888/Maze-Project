@@ -9,6 +9,7 @@ public class camMouseLook : MonoBehaviour
 	private Vector2 smoothV;
 	public float sensitivity = 5.0f;
 	public float smoothing = 2.0f;
+	private bool _gameFinished = false;
 
 	private GameObject character;
 	
@@ -20,6 +21,11 @@ public class camMouseLook : MonoBehaviour
 	
 	// Update is called once per frame
 	void Update () {
+		if (_gameFinished)
+		{
+			return;
+		}
+		
 		var md = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
 		md = Vector2.Scale(md, new Vector2(sensitivity * smoothing, sensitivity * smoothing));
@@ -29,5 +35,10 @@ public class camMouseLook : MonoBehaviour
 		
 		transform.localRotation = Quaternion.AngleAxis(-mouseLook.y, Vector3.right);
 		character.transform.localRotation = Quaternion.AngleAxis(mouseLook.x, character.transform.up);
+	}
+
+	public void SetGameFinished(bool gameFinished)
+	{
+		_gameFinished = gameFinished;
 	}
 }

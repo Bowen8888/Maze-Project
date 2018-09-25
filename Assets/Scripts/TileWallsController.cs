@@ -8,6 +8,7 @@ public class TileWallsController : MonoBehaviour
 	private GameObject _westWall;
 	private GameObject _eastWall;
 	private GameObject _southWall;
+	private GameObject _northWall;
 	private int _row;
 	
 	// Use this for initialization
@@ -16,6 +17,7 @@ public class TileWallsController : MonoBehaviour
 		_westWall = gameObject.transform.GetChild(0).gameObject;
 		_eastWall = gameObject.transform.GetChild(1).gameObject;
 		_southWall = gameObject.transform.GetChild(2).gameObject;
+		_northWall = gameObject.transform.GetChild(4).gameObject;
 	}
 	
 	// Update is called once per frame
@@ -27,7 +29,8 @@ public class TileWallsController : MonoBehaviour
 	{
 		WestWall,
 		EastWall,
-		SouthWall
+		SouthWall,
+		NorthWall
 	}
 	
 	public void SetWallActivate(TileWallName tileWallName,bool active)
@@ -42,6 +45,9 @@ public class TileWallsController : MonoBehaviour
 				break;
 			case TileWallName.SouthWall:
 				_southWall.SetActive(active);
+				break;
+			case TileWallName.NorthWall:
+				_northWall.SetActive(active);
 				break;
 			default:
 				throw new ArgumentOutOfRangeException("tileWallName", tileWallName, null);

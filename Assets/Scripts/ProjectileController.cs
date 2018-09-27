@@ -21,7 +21,7 @@ public class ProjectileController : MonoBehaviour
 	{
 		if (onTriggerAction != null)
 		{
-			onTriggerAction(transform.position.x);
+			onTriggerAction(transform.position.z);
 		}
 	}
 	

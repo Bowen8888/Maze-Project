@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TileManager : MonoBehaviour
@@ -29,39 +30,67 @@ public class TileManager : MonoBehaviour
 
 	private void GenerateRaw()
 	{
-		List<int> southWallOpen = new List<int>();
+		Dictionary<int, List<int>> southWallOpenmap = new Dictionary<int, List<int>>();
 		if (_spawnZ > 0)
 		{
-			List<int> indexes = new List<int>();
-
-			int t = -1;
-			for (int i = 0; i < 8; i++)
-			{
-				if (_previousRow[i] != t)
-				{
-					t = _previousRow[i];
-					southWallOpen.AddRange(GetRandomNonEmptySubset(indexes));
-					indexes.Clear();
-					indexes.Add(i);
-				}
-				else
-				{
-					indexes.Add(i);
-				}
-			}
 			
-			southWallOpen.AddRange(GetRandomNonEmptySubset(indexes));
+			Dictionary<int, List<int>> indexmap = new Dictionary<int, List<int>>();
+
+			for (int i=0; i< 8; i++)
+			{
+				if (!indexmap.Keys.Contains(_previousRow[i]))
+				{
+					indexmap[_previousRow[i]] = new List<int>();
+
+				}
+				indexmap[_previousRow[i]].Add(i);
+			}
+
+			
+			foreach (var indexpair in indexmap)
+			{
+				southWallOpenmap[indexpair.Key] = GetRandomNonEmptySubset(indexpair.Value);
+			}
 		}
 		
-		System.Random rnd = new System.Random();
-		int k = 0;
-		_previousRow[0] = k;
+		//assume southWallOpenmap contains the mapping from all set id to its corresponding cell index
+		
+		//translate the map into array
+		int[] currentRow = new int[8];
+		for (int i = 0 ; i<8 ;i++)
+		{
+			currentRow[i] = -1;
+		}
+
+		int max = -1;
+		List<int> southWallOpen = new List<int>();
+		foreach (var indexpair in southWallOpenmap)
+		{
+			foreach (var index in indexpair.Value)
+			{
+				currentRow[index] = indexpair.Key;
+				southWallOpen.Add(index);
+				max = Math.Max(max, indexpair.Key);
+			}
+		}
+		
+		//flush the cells
+		for (int i = 0 ; i<8 ;i++)
+		{
+			if (currentRow[i] == -1)
+			{
+				currentRow[i] = ++max;
+			}
+		}
+		var rnd = new System.Random();
+
 		for (int i = 0; i < 8; i++)
 		{
 			GameObject tileCopy = Instantiate(FloorPrefab);
 			tileCopy.transform.SetParent(transform);
 			tileCopy.transform.position += Vector3.left * (i*5) + Vector3.forward * _spawnZ;
 
+			//first row open southwall of enter and exit
 			if (_spawnZ == 0)
 			{
 				if (i == 0 || i == 7)
@@ -70,27 +99,37 @@ public class TileManager : MonoBehaviour
 						.SetWallActivate(TileWallsController.TileWallName.SouthWall,false);
 				}
 			}
-
-			if (southWallOpen.Contains(i))
-			{
-				tileCopy.GetComponent<TileWallsController>()
-					.SetWallActivate(TileWallsController.TileWallName.SouthWall,false);
-			}
-
-			if (i < 7)
-			{
-				if (rnd.NextDouble() < 0.5)
+			else {
+				if (southWallOpen.Contains(i))//remove southwall if cell is in the same set as the previous cell in the same column
 				{
 					tileCopy.GetComponent<TileWallsController>()
-						.SetWallActivate(TileWallsController.TileWallName.WestWall,true);
-					_previousRow[i+1] = ++k;
-				}
-				else
-				{
-					_previousRow[i+1] = k;
+						.SetWallActivate(TileWallsController.TileWallName.SouthWall,false);
 				}
 			}
 			
+			//merge cells of different set and construct walls between two cells in the same row
+			if(i < 7)
+			{
+				int curCellSet = currentRow[i];
+				int nextCellSet = currentRow[i + 1];
+				//merge
+				double randomDouble = rnd.NextDouble();
+				if (curCellSet != nextCellSet && randomDouble < 0.5)
+				{
+					tileCopy.GetComponent<TileWallsController>()
+						.SetWallActivate(TileWallsController.TileWallName.WestWall, false);
+					int min = Math.Min(curCellSet,nextCellSet);
+					for (int j =0; j<8; j++)
+					{
+						if (currentRow[j] == curCellSet || currentRow[j] == nextCellSet)
+						{
+							currentRow[j] = min;
+						}
+					}
+				}
+			}
+			
+			//construct borders
 			if (i == 0)
 			{
 				tileCopy.GetComponent<TileWallsController>()
@@ -103,6 +142,12 @@ public class TileManager : MonoBehaviour
 			}
 
 			_lastRow[i] = tileCopy;
+		}
+		
+		//update previousRow
+		for (int j = 0; j< 8; j++)
+		{
+			_previousRow[j] = currentRow[j];
 		}
 		_spawnZ += 5;
 	}

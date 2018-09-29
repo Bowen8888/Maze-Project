@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TileWallsController : MonoBehaviour
@@ -9,7 +10,7 @@ public class TileWallsController : MonoBehaviour
 	private GameObject _eastWall;
 	private GameObject _southWall;
 	private GameObject _northWall;
-	private int _row;
+	private Dictionary<GameObject, int> _projectileResistanceMap = new Dictionary<GameObject, int>();
 	
 	// Use this for initialization
 	void Awake ()
@@ -18,6 +19,9 @@ public class TileWallsController : MonoBehaviour
 		_eastWall = gameObject.transform.GetChild(1).gameObject;
 		_southWall = gameObject.transform.GetChild(2).gameObject;
 		_northWall = gameObject.transform.GetChild(4).gameObject;
+
+		_projectileResistanceMap[_westWall] = 3;
+		_projectileResistanceMap[_southWall] = 3;
 	}
 	
 	// Update is called once per frame
@@ -54,13 +58,23 @@ public class TileWallsController : MonoBehaviour
 		}
 	}
 
-	public void SetRow(int row)
+	public void DecreaseResistance(GameObject tileWall)
 	{
-		_row = row;
+		if (!_projectileResistanceMap.Keys.Contains(tileWall))
+		{
+			Debug.Log("This wall is not destroyable.");
+			return;
+		}
+		
+		_projectileResistanceMap[tileWall]--;
+		if (_projectileResistanceMap[tileWall] <= 0)
+		{
+			tileWall.SetActive(false);
+		}
 	}
 
-	public int GetRow()
+	public void UntagWestWall()
 	{
-		return _row;
+		_westWall.tag = "Untagged";
 	}
 }

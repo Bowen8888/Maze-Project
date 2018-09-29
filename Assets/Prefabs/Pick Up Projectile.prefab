@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4933222105146346}
   m_Layer: 0
   m_Name: Pick Up Projectile
-  m_TagString: Untagged
+  m_TagString: ProjectilePickUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

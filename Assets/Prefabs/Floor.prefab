@@ -99,7 +99,7 @@ GameObject:
   - component: {fileID: 65262664492577750}
   m_Layer: 0
   m_Name: NorthWall
-  m_TagString: TileWall
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 4741682385323364}
   m_Layer: 0
   m_Name: Pick Up Projectile
-  m_TagString: Untagged
+  m_TagString: ProjectilePickUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -27,10 +27,14 @@ public class ProjectileController : MonoBehaviour
 	
 	private void OnTriggerEnter(Collider other)
 	{
-		Destroy(gameObject);
+		if (!other.gameObject.CompareTag("Pick Up"))
+		{
+			Destroy(gameObject);
+		}
+		
 		if (other.gameObject.CompareTag("TileWall"))
 		{
-			other.gameObject.SetActive(false);
+			other.gameObject.transform.parent.GetComponent<TileWallsController>().DecreaseResistance(other.gameObject);
 		}
 	}
 

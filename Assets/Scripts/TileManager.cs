@@ -24,11 +24,11 @@ public class TileManager : MonoBehaviour
 	void Update () {
 		if (_playerTransform.position.z > _spawnZ + 10)
 		{
-			GenerateRaw();
+			GenerateRaw(false);
 		}
 	}
 
-	private void GenerateRaw()
+	private void GenerateRaw(bool completeMaze)
 	{
 		Dictionary<int, List<int>> southWallOpenmap = new Dictionary<int, List<int>>();
 		if (_spawnZ > 0)
@@ -114,7 +114,7 @@ public class TileManager : MonoBehaviour
 				int nextCellSet = currentRow[i + 1];
 				//merge
 				double randomDouble = rnd.NextDouble();
-				if (curCellSet != nextCellSet && randomDouble < 0.5)
+				if (curCellSet != nextCellSet && (randomDouble < 0.5 || completeMaze))
 				{
 					tileCopy.GetComponent<TileWallsController>()
 						.SetWallActivate(TileWallsController.TileWallName.WestWall, false);
@@ -128,6 +128,13 @@ public class TileManager : MonoBehaviour
 					}
 				}
 			}
+
+			//construct northwall
+			if (completeMaze)
+			{
+				tileCopy.GetComponent<TileWallsController>()
+					.SetWallActivate(TileWallsController.TileWallName.NorthWall, true);
+			}
 			
 			//construct borders
 			if (i == 0)
@@ -139,6 +146,8 @@ public class TileManager : MonoBehaviour
 			{
 				tileCopy.GetComponent<TileWallsController>()
 					.SetWallActivate(TileWallsController.TileWallName.WestWall,true);
+				tileCopy.GetComponent<TileWallsController>()
+					.UntagWestWall();
 			}
 
 			_lastRow[i] = tileCopy;
@@ -180,9 +189,11 @@ public class TileManager : MonoBehaviour
 
 	public void ConstructNorthWalls()
 	{
-		foreach (var tile in _lastRow)
-		{
-			tile.GetComponent<TileWallsController>().SetWallActivate(TileWallsController.TileWallName.NorthWall, true);
-		}
+//		foreach (var tile in _lastRow)
+//		{
+//			tile.GetComponent<TileWallsController>().SetWallActivate(TileWallsController.TileWallName.NorthWall, true);
+//		}
+		
+		GenerateRaw(true);
 	}
 }

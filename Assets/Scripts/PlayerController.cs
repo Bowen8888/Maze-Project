@@ -47,6 +47,11 @@ public class PlayerController : MonoBehaviour
                 rb.AddForce(Vector3.up * 15    , ForceMode.Impulse);
             }
             
+            if (projectileCount > 0 && Input.GetKeyDown(KeyCode.F))
+            {
+                Fire();
+            }
+            
             float moveHorizontal = Input.GetAxis("Horizontal") * speed;
             float moveVertical = Input.GetAxis("Vertical") * speed;
 
@@ -54,11 +59,6 @@ public class PlayerController : MonoBehaviour
             moveVertical *= Time.deltaTime;
         
             transform.Translate(moveHorizontal,0,moveVertical);
-        }
-
-        if (projectileCount > 0 && Input.GetKeyDown(KeyCode.F))
-        {
-            Fire();
         }
     }
 
